@@ -10,7 +10,28 @@ const jobRateLimiter = rateLimit({
   message: { message: 'Too many requests, please try again later' },
 });
 
-const categories = ['Delivery', 'Cleaning', 'Construction', 'IT', 'Labor', 'Trade'];
+const categories = [
+  'Delivery',
+  'Cleaning',
+  'Construction',
+  'IT',
+  'Labor',
+  'Trade',
+  'Gardening',
+  'Moving',
+  'Handyman',
+  'Tutoring',
+  'Healthcare',
+  'Customer Service',
+  'Design',
+  'Marketing',
+  'Administration',
+  'Event Support',
+  'Security',
+  'Food Service',
+  'Freelance',
+  'Other',
+];
 const locationsByProvince = {
   Ontario: ['Toronto', 'Ottawa', 'Hamilton', 'Mississauga', 'Brampton', 'London', 'Kitchener', 'Windsor'],
   'British Columbia': ['Vancouver', 'Victoria', 'Surrey', 'Richmond'],
@@ -91,19 +112,27 @@ router.post('/', jobRateLimiter, async (req, res) => {
       return res.status(400).json({ message: 'Invalid category' });
     }
 
-    if (!provinces.includes(province)) {
+    const normalizeValue = (value) => String(value || '')
+      .trim()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[\.\-\s']+/g, '');
+
+    const normalizedProvinceKey = Object.keys(locationsByProvince).find((p) => normalizeValue(p) === normalizeValue(province));
+    if (!normalizedProvinceKey) {
       return res.status(400).json({ message: 'Invalid province selection' });
     }
 
-    const normalizeCity = (value) => String(value || '').trim().toLowerCase().replace(/[\.\-\s']+/g, '');
-    const cityList = locationsByProvince[province] || [];
-    const matchedCity = cityList.find((c) => normalizeCity(c) === normalizeCity(city));
-
-    if (!matchedCity) {
-      return res.status(400).json({ message: 'Invalid city for selected province' });
+    if (!city || String(city).trim().length === 0) {
+      return res.status(400).json({ message: 'City is required' });
     }
 
-    const normalizedCity = matchedCity;
+    const cityList = locationsByProvince[normalizedProvinceKey] || [];
+    const matchedCity = cityList.find((c) => normalizeValue(c) === normalizeValue(city));
+
+    const normalizedCity = matchedCity || String(city).trim();
+    const normalizedProvince = normalizedProvinceKey;
 
     if (!req.user && !anonymousName) {
       return res.status(400).json({ message: 'Anonymous name is required for public post' });
@@ -143,7 +172,7 @@ router.post('/', jobRateLimiter, async (req, res) => {
       title,
       description,
       category,
-      province,
+      province: normalizedProvince,
       city: normalizedCity,
       otherProvince: null,
       posterId,

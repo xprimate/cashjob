@@ -1,1 +1,22 @@
-export const jobCategories = ['Delivery', 'Cleaning', 'IT', 'Construction',  'Labor', 'Trade'];
+export const jobCategories = [
+  'Delivery',
+  'Cleaning',
+  'IT',
+  'Construction',
+  'Labor',
+  'Trade',
+  'Gardening',
+  'Moving',
+  'Handyman',
+  'Tutoring',
+  'Healthcare',
+  'Customer Service',
+  'Design',
+  'Marketing',
+  'Administration',
+  'Event Support',
+  'Security',
+  'Food Service',
+  'Freelance',
+  'Other',
+];
