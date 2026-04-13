@@ -162,7 +162,7 @@ export default function JobList() {
               {job.contactPhone && <p><strong>Phone:</strong> {job.contactPhone}</p>}
 
               {selectedJobId === job.id && (
-                <div style={{ marginTop: '10px', background: '#f4f9ff', padding: '10px', borderRadius: '6px' }}>
+                <div style={{ marginTop: '10px', background: '#f4f9ff', padding: '10px', borderRadius: '6px' }} onClick={e => e.stopPropagation()}>
                   {editingJobId === job.id ? (
                     <div>
                       <label>
